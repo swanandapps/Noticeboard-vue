@@ -22,7 +22,7 @@
     <v-flex v-for="(card,index) in cards" :key="index" style="width:100%" xs3 >
       <v-card  id="card">
         <v-img st
-          :src="card.image"
+          :src="card.cardholder_image"
           height="213px"
         >
         </v-img>
@@ -30,6 +30,7 @@
         <v-card-title primary-title>
         
             <div class="title"><b>{{card.tasktitle}}</b></div>
+           
             
           
         </v-card-title>
@@ -79,7 +80,6 @@ export default {
       }).then(function(ID) {
         tempthis.$store.state.current_emp_id = ID.value;
         console.log(tempthis.$store.state.current_emp_id);
-        
 
         db.collection("Employees")
           .where("id", "==", ID.value)
@@ -125,6 +125,7 @@ export default {
   created() {
     var cards = this.cards;
     console.log(this.$store.state.current_emp_id);
+    console.log(this.cards);
 
     db.collection("Card")
       .get()

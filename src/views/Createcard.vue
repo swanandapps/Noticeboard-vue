@@ -115,7 +115,10 @@ export default {
         tasktitle: this.card.tasktitle
       };
 
+//temporary this due to scope issues
       let tempthis = this;
+
+//Adding the Card to database
       db.collection("Card")
         .add({
           cardholder: this.$store.state.current_employee[0].name,
@@ -124,10 +127,14 @@ export default {
           description: this.card.description,
           projectname: this.card.projectname,
 
-          tasktitle: this.card.tasktitle
+          tasktitle: this.card.tasktitle,
+          cardholder_image: this.$store.state.current_employee[0].image
         })
         .then(function() {
         
+
+  //Counting Number of Cards CREATED by employee
+
     db.collection("Card")
       .where("cardholder", "==", tempthis.current_employee[0].name)
       .get()
@@ -144,15 +151,24 @@ export default {
             
           }
         });
-        tempthis.count =count
+        tempthis.count =count+1;
+        
         console.log(tempthis.count)
+
+        tempthis.$swal(
+  'Sucess!',
+  'Card Added to Dashboard!',
+  'success'
+)
+        
       });
 
           console.log("Document successfully written!");
            var update_cards = db.collection("Employees").doc(tempthis.$store.state.current_doc_id)
 
     return update_cards.update({
-    cards_created: tempthis.count
+      
+    cards_created:  tempthis.count
 } )
     
           
@@ -167,6 +183,7 @@ export default {
         
     },
 
+// Clear form data
     clear() {
       this.$v.$reset();
       this.name = "";
@@ -181,6 +198,7 @@ export default {
 
   created() {
    
+   //Get Employee data from database using employee id accepted on home.vue
     this.$store.state.current_employee = [];
     console.log(this);
     let tempthis = this;
