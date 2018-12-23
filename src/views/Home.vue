@@ -55,6 +55,7 @@
 <script>
 import axios from "axios";
 import db from "../components/firebaseinit.js";
+import { mapState } from "vuex";
 export default {
   name: "home",
   data() {
@@ -64,20 +65,21 @@ export default {
       flag: 0
     };
   },
-  watch: {
-    // call again the method if the route changes
-    $route: "Cards"
+  computed: {
+    ...mapState(["current_emp_id"])
   },
   methods: {
     createcard: function() {
       var tempthis = this;
       tempthis.flag = 0;
-      console.log(tempthis.flag);
+
       this.$swal({
         title: "Enter Employee ID",
         input: "text"
       }).then(function(ID) {
-        console.log(ID.value);
+        tempthis.$store.state.current_emp_id = ID.value;
+        console.log(tempthis.$store.state.current_emp_id);
+        
 
         db.collection("Employees")
           .where("id", "==", ID.value)
@@ -122,6 +124,7 @@ export default {
 
   created() {
     var cards = this.cards;
+    console.log(this.$store.state.current_emp_id);
 
     db.collection("Card")
       .get()

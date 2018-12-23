@@ -1,20 +1,13 @@
 <template>
    <div>
-<h1 style="text-align:center;margin-top:2%">Create a Card</h1>
+<h1 style="text-align:center;margin-top:2%"> Welcome {{this.$store.state.current_employee[0].name}}, Create a Card here</h1>
 <div class="line"></div>
           <el-col :span="24"><div class="grid-content bg-purple-dark"></div>
 
 
         <form id="addprodform">
           
-    <v-text-field
-      v-model="card.cardholder"
-    hint
-      label="Name"
-      required
-      @input="$v.name.$touch()"
-      @blur="$v.name.$touch()"
-    ></v-text-field>
+ 
 
     <v-text-field
       v-model="card.tasktitle"
@@ -26,7 +19,7 @@
     ></v-text-field>
     <v-text-field
       v-model="card.deadline"
-      :error-messages="nameErrors"
+      
 
       label="Deadline"
       required
@@ -34,7 +27,7 @@
     ></v-text-field>
     <v-text-field
       v-model="card.projectname"
-      :error-messages="nameErrors"
+      
 
       label="Project Name"
       required
@@ -44,7 +37,7 @@
 
     <v-text-field 
       v-model="card.groupid"
-      :error-messages="nameErrors"
+      
 
       label="Group ID"
       required
@@ -68,23 +61,7 @@
     <v-btn @click="clear">clear</v-btn>
   </form>
 
-<!--
-<h1 style="text-align:center;margin-top:5%">Update Product Dispatch Date</h1>
-<div class="line"></div>
-  <form  id="dispatchform">
 
- <v-text-field id="inputdispatch"
-      v-model="dispatchdate"
-    hint
-      label="Dispatch Date"
-      required
-
-    ></v-text-field>
-    <v-btn @click="submitdate"> Update Date</v-btn>
-
-  </form>
-<div class="line"></div>
--->
  </el-col>
 
 
@@ -97,6 +74,7 @@
 import db from "../components/firebaseinit.js";
 import { validationMixin } from "vuelidate";
 import { required, maxLength } from "vuelidate/lib/validators";
+import { mapState } from "vuex";
 
 export default {
   data: () => ({
@@ -108,9 +86,12 @@ export default {
       groupid: "",
 
       projectname: ""
-    }
+    },
+    count:''
   }),
-
+  computed: {
+    ...mapState(["current_emp_id", "current_employee","current_doc_id"])
+  },
   mixins: [validationMixin],
 
   validations: {
@@ -125,7 +106,7 @@ export default {
     submit() {
       console.log(this);
       const carddata = {
-        cardholder: this.card.cardholder,
+        cardholder: this.$store.state.current_employee[0].name,
         deadline: this.card.deadline,
         groupid: this.card.groupid,
         description: this.card.description,
@@ -134,9 +115,10 @@ export default {
         tasktitle: this.card.tasktitle
       };
 
+      let tempthis = this;
       db.collection("Card")
         .add({
-          cardholder: this.card.cardholder,
+          cardholder: this.$store.state.current_employee[0].name,
           deadline: this.card.deadline,
           groupid: this.card.groupid,
           description: this.card.description,
@@ -145,11 +127,44 @@ export default {
           tasktitle: this.card.tasktitle
         })
         .then(function() {
+        
+    db.collection("Card")
+      .where("cardholder", "==", tempthis.current_employee[0].name)
+      .get()
+      .then(function(DocumentSnapshot) {
+       let count=0
+        DocumentSnapshot.forEach(function(doc) {
+          
+          // doc.data() is never undefined for query doc snapshots
+          {
+            var data = doc.data();
+            count =count+1;
+
+            
+            
+          }
+        });
+        tempthis.count =count
+        console.log(tempthis.count)
+      });
+
           console.log("Document successfully written!");
+           var update_cards = db.collection("Employees").doc(tempthis.$store.state.current_doc_id)
+
+    return update_cards.update({
+    cards_created: tempthis.count
+} )
+    
+          
         })
         .catch(function(error) {
           console.error("Error writing document: ", error);
         });
+
+        
+      
+    
+        
     },
 
     clear() {
@@ -165,7 +180,41 @@ export default {
   },
 
   created() {
-    console.log(carddata);
+   
+    this.$store.state.current_employee = [];
+    console.log(this);
+    let tempthis = this;
+    db.collection("Employees")
+      .where("id", "==", tempthis.$store.state.current_emp_id)
+      .get()
+      .then(function(DocumentSnapshot) {
+        DocumentSnapshot.forEach(function(doc) {
+          // doc.data() is never undefined for query doc snapshots
+          {
+            var data = doc.data();
+
+            console.log(data)
+            tempthis.$store.state.current_doc_id = doc.id
+            
+            tempthis.$store.state.current_employee.push(data);
+          }
+        });
+      });
+
+
+    
+
+    
+
+
+
+
+
+
+
+
+
+     
   }
 };
 </script>

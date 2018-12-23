@@ -4,7 +4,13 @@ import Vuex from "vuex";
 Vue.use(Vuex);
 
 export default new Vuex.Store({
-  state: {},
-  mutations: {},
-  actions: {}
+    state: {
+
+        current_emp_id: '',
+        current_employee: [],
+        current_doc_id:''
+
+    },
+    mutations: {},
+    actions: {}
 });
