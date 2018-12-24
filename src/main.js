@@ -13,6 +13,11 @@ import 'material-design-icons-iconfont/dist/material-design-icons.css';
 import Vuetify from "vuetify";
 import VueSweetalert2 from 'vue-sweetalert2';
 import 'vuetify/dist/vuetify.min.css'
+import ElementUI from 'element-ui'
+import locale from 'element-ui/lib/locale/lang/en'
+import 'element-ui/lib/theme-chalk/index.css'
+
+Vue.use(ElementUI, { locale })
 
 Vue.use(Vuetify)
 

@@ -6,8 +6,8 @@
   <el-col  style="width:35%"><div class="grid-content bg-purple"><span id="nbtext"><b >NoticeBoard</b></span> <br> <span id="nbtext2">Designed and Developed by Swanand</span> </div></el-col>
   <el-col style="width:45%" >
 
-<input type="search" name="Search" id="inputsearch">
-<v-icon id="searchicon">search</v-icon>
+<input type="search" v-model="searchquery" name="Search" id="inputsearch">
+<v-icon @click="searchcard()" id="searchicon">search</v-icon>
 
 </el-col>
   <el-col style="width:20%">
@@ -18,8 +18,8 @@
       </el-col>
 </el-row>
 
- <v-layout row style="margin-top:3%">
-    <v-flex v-for="(card,index) in cards" :key="index" style="width:100%" xs3 >
+ <el-row id="products" row style="margin-top:3%">
+    <el-col id="store-col" :span="6" v-for="(card,index) in cards" :key="index"   >
       <v-card  id="card">
         <v-img st
           :src="card.cardholder_image"
@@ -30,7 +30,7 @@
         <v-card-title primary-title>
         
             <div class="title"><b>{{card.tasktitle}}</b></div>
-           
+            
             
           
         </v-card-title>
@@ -44,8 +44,8 @@
 
        </div>
       </v-card>
-    </v-flex>
-  </v-layout>
+    </el-col>
+  </el-row>
 
 
   
@@ -65,18 +65,59 @@ export default {
       cards: [],
       flag: 0
     };
+
+    searchquery:''
   },
   computed: {
     ...mapState(["current_emp_id"])
   },
   methods: {
+
+    searchcard : function () {
+      
+     
+
+      this.cards = this.cards.filter(cards => cards.cardholder.toLowerCase() == this.searchquery.toLowerCase());
+      if(this.cards.length ==0){
+
+          this.$swal({
+                type: "error",
+                title: "Card Not Found Here",
+                text: "Please Type Full Name of Employee e.g. John Doe",
+                preConfirm : () => {
+
+                 var cards = this.cards;
+    console.log(this.$store.state.current_emp_id);
+    console.log(this.cards);
+
+    db.collection("Card")
+      .get()
+      .then(function(DocumentSnapshot) {
+        DocumentSnapshot.forEach(function(doc) {
+          // doc.data() is never undefined for query doc snapshots
+          var data = doc.data();
+
+          cards.push(data);
+        });
+      });
+
+                }
+          })
+
+              
+              
+
+      }
+                
+    },
     createcard: function() {
       var tempthis = this;
       tempthis.flag = 0;
 
       this.$swal({
         title: "Enter Employee ID",
-        input: "text"
+        input: "text",
+        allowEnterKey :true
       }).then(function(ID) {
         tempthis.$store.state.current_emp_id = ID.value;
         console.log(tempthis.$store.state.current_emp_id);
@@ -144,6 +185,16 @@ export default {
 
 <style scoped>
 @import url("https://fonts.googleapis.com/css?family=Raleway|Roboto");
+@import url("https://unpkg.com/element-ui/lib/theme-chalk/index.css");
+#products {
+    width: 100%;
+    
+  }
+  #store-col {
+    width: 34%;
+    height: 466px;
+
+  }
 .title {
   text-align: left;
   font-family: "Roboto", sans-serif;
@@ -220,5 +271,56 @@ export default {
 #nbtext2 {
   margin-left: -36%;
   font-size: 80%;
+}
+
+@media screen and (max-width: 480px){
+
+
+   #store-col {
+    width: 100%;
+    height: 466px;
+    margin-top:10%
+
+   
+  }
+  #products {
+    width: 100%;
+ 
+    margin-left: -1%;
+  }
+}
+
+@media screen and (min-width: 481px) and (max-width: 720px){
+
+ #store-col {
+    width: 50%;
+    height: 466px;
+     margin-top:8%
+  }
+
+
+
+
+}
+
+@media screen and (min-width: 721px) and (max-width: 1024px){
+
+#store-col {
+    width: 33%;
+    height: 466px;
+     margin-top:6%
+  }
+
+
+}
+
+@media screen and (min-width: 1025px) and (max-width: 1400px){
+
+
+#store-col {
+  width: 25%;
+ 
+}
+
 }
 </style>
