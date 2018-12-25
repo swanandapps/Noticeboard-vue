@@ -4,8 +4,8 @@ import firebaseconfig from './firebaseconfig'
 
 const firebaseapp = firebase.initializeApp(firebaseconfig)
 const firestore = firebase.firestore()
-firestore.settings({
+ const settings = {
     timestampsInSnapshots: true
-})
-
+}
+firestore.settings(settings);
 export default firebaseapp.firestore()

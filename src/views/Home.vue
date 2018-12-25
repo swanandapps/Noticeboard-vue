@@ -66,49 +66,27 @@ export default {
       flag: 0
     };
 
-    searchquery:''
+    searchquery: "";
   },
   computed: {
     ...mapState(["current_emp_id"])
   },
   methods: {
-
-    searchcard : function () {
-      
-     
-
-      this.cards = this.cards.filter(cards => cards.cardholder.toLowerCase() == this.searchquery.toLowerCase());
-      if(this.cards.length ==0){
-
-          this.$swal({
-                type: "error",
-                title: "Card Not Found Here",
-                text: "Please Type Full Name of Employee e.g. John Doe",
-                preConfirm : () => {
-
-                 var cards = this.cards;
-    console.log(this.$store.state.current_emp_id);
-    console.log(this.cards);
-
-    db.collection("Card")
-      .get()
-      .then(function(DocumentSnapshot) {
-        DocumentSnapshot.forEach(function(doc) {
-          // doc.data() is never undefined for query doc snapshots
-          var data = doc.data();
-
-          cards.push(data);
+    searchcard: function() {
+      this.cards = this.cards.filter(
+        cards =>
+          cards.cardholder.toLowerCase() == this.searchquery.toLowerCase()
+      );
+      if (this.cards.length == 0) {
+        this.$swal({
+          type: "error",
+          title: "Card Not Found",
+          text: "Please Type Full Name of Employee e.g. John Doe",
+          preConfirm: () => {
+            this.$router.go(0);
+          }
         });
-      });
-
-                }
-          })
-
-              
-              
-
       }
-                
     },
     createcard: function() {
       var tempthis = this;
@@ -117,7 +95,7 @@ export default {
       this.$swal({
         title: "Enter Employee ID",
         input: "text",
-        allowEnterKey :true
+        allowEnterKey: true
       }).then(function(ID) {
         tempthis.$store.state.current_emp_id = ID.value;
         console.log(tempthis.$store.state.current_emp_id);
@@ -167,6 +145,7 @@ export default {
     var cards = this.cards;
     console.log(this.$store.state.current_emp_id);
     console.log(this.cards);
+    1;
 
     db.collection("Card")
       .get()
@@ -187,14 +166,12 @@ export default {
 @import url("https://fonts.googleapis.com/css?family=Raleway|Roboto");
 @import url("https://unpkg.com/element-ui/lib/theme-chalk/index.css");
 #products {
-    width: 100%;
-    
-  }
-  #store-col {
-    width: 34%;
-    height: 466px;
-
-  }
+  width: 100%;
+}
+#store-col {
+  width: 34%;
+  height: 466px;
+}
 .title {
   text-align: left;
   font-family: "Roboto", sans-serif;
@@ -273,54 +250,38 @@ export default {
   font-size: 80%;
 }
 
-@media screen and (max-width: 480px){
-
-
-   #store-col {
+@media screen and (max-width: 480px) {
+  #store-col {
     width: 100%;
     height: 466px;
-    margin-top:10%
-
-   
+    margin-top: 10%;
   }
   #products {
     width: 100%;
- 
+
     margin-left: -1%;
   }
 }
 
-@media screen and (min-width: 481px) and (max-width: 720px){
-
- #store-col {
+@media screen and (min-width: 481px) and (max-width: 720px) {
+  #store-col {
     width: 50%;
     height: 466px;
-     margin-top:8%
+    margin-top: 8%;
   }
-
-
-
-
 }
 
-@media screen and (min-width: 721px) and (max-width: 1024px){
-
-#store-col {
+@media screen and (min-width: 721px) and (max-width: 1024px) {
+  #store-col {
     width: 33%;
     height: 466px;
-     margin-top:6%
+    margin-top: 6%;
   }
-
-
 }
 
-@media screen and (min-width: 1025px) and (max-width: 1400px){
-
-
-#store-col {
-  width: 25%;
- 
-}
-
+@media screen and (min-width: 1025px) and (max-width: 1400px) {
+  #store-col {
+    width: 25%;
+  }
 }
 </style>

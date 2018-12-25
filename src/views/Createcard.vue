@@ -1,6 +1,6 @@
 <template>
    <div>
-<h1 style="text-align:center;margin-top:2%"> Welcome {{this.$store.state.current_employee[0].name}}, Create a Card here</h1>
+<h1 style="text-align:center;margin-top:2%"> Welcome  {{this.$store.state.current_employee[0].name}}, Create a Card here</h1>
 <div class="line"></div>
           <el-col :span="24"><div class="grid-content bg-purple-dark"></div>
 
@@ -85,12 +85,13 @@ export default {
       description: "",
       groupid: "",
 
-      projectname: ""
+      projectname: "",
+      timestamp: ""
     },
-    count:''
+    count: 1
   }),
   computed: {
-    ...mapState(["current_emp_id", "current_employee","current_doc_id"])
+    ...mapState(["current_emp_id", "current_employee", "current_doc_id"])
   },
   mixins: [validationMixin],
 
@@ -104,21 +105,20 @@ export default {
 
   methods: {
     submit() {
+      //Get Card Creation Timestamp
       console.log(this);
-      const carddata = {
-        cardholder: this.$store.state.current_employee[0].name,
-        deadline: this.card.deadline,
-        groupid: this.card.groupid,
-        description: this.card.description,
-        projectname: this.card.projectname,
+      var date = new Date();
 
-        tasktitle: this.card.tasktitle
-      };
+      var firestore_date = db.app.firebase_.firestore.Timestamp.fromDate(
+        date
+      ).toDate();
 
-//temporary this due to scope issues
+      this.timestamp = firestore_date;
+
+      //temporary this due to scope issues
       let tempthis = this;
 
-//Adding the Card to database
+      //Adding the Card to database
       db.collection("Card")
         .add({
           cardholder: this.$store.state.current_employee[0].name,
@@ -128,62 +128,45 @@ export default {
           projectname: this.card.projectname,
 
           tasktitle: this.card.tasktitle,
-          cardholder_image: this.$store.state.current_employee[0].image
+          cardholder_image: this.$store.state.current_employee[0].image,
+          timestamp: tempthis.timestamp
         })
         .then(function() {
-        
+          //Counting Number of Cards CREATED by employee
 
-  //Counting Number of Cards CREATED by employee
+          db.collection("Employees")
+            .where("id", "==", tempthis.$store.state.current_emp_id)
+            .get()
+            .then(function(DocumentSnapshot) {
+              DocumentSnapshot.forEach(function(doc) {
+                // doc.data() is never undefined for query doc snapshots
+                {
+                  var data = doc.data();
+                }
+                tempthis.count = data.cards_created + 1;
 
-    db.collection("Card")
-      .where("cardholder", "==", tempthis.current_employee[0].name)
-      .get()
-      .then(function(DocumentSnapshot) {
-       let count=0
-        DocumentSnapshot.forEach(function(doc) {
-          
-          // doc.data() is never undefined for query doc snapshots
-          {
-            var data = doc.data();
-            count =count+1;
+                console.log(tempthis.count);
+              });
 
-            
-            
-          }
-        });
-        tempthis.count =count+1;
-        
-        console.log(tempthis.count)
-
-        tempthis.$swal(
-  'Sucess!',
-  'Card Added to Dashboard!',
-  'success'
-)
-        
-      });
+              tempthis.$swal("Sucess!", "Card Added to Dashboard!", "success");
+            });
 
           console.log("Document successfully written!");
-           var update_cards = db.collection("Employees").doc(tempthis.$store.state.current_doc_id)
 
-    return update_cards.update({
-      
-    cards_created:  tempthis.count
-} )
-    
-          
+          var update_cards = db
+            .collection("Employees")
+            .doc(tempthis.$store.state.current_doc_id);
+
+          return update_cards.update({
+            cards_created: tempthis.count
+          });
         })
         .catch(function(error) {
           console.error("Error writing document: ", error);
         });
-
-        
-      
-    
-        
     },
 
-// Clear form data
+    // Clear form data
     clear() {
       this.$v.$reset();
       this.name = "";
@@ -197,8 +180,7 @@ export default {
   },
 
   created() {
-   
-   //Get Employee data from database using employee id accepted on home.vue
+    //Get Current Employee data from database using employee id accepted on home.vue
     this.$store.state.current_employee = [];
     console.log(this);
     let tempthis = this;
@@ -211,28 +193,13 @@ export default {
           {
             var data = doc.data();
 
-            console.log(data)
-            tempthis.$store.state.current_doc_id = doc.id
-            
+            console.log(data);
+            tempthis.$store.state.current_doc_id = doc.id;
+
             tempthis.$store.state.current_employee.push(data);
           }
         });
       });
-
-
-    
-
-    
-
-
-
-
-
-
-
-
-
-     
   }
 };
 </script>
