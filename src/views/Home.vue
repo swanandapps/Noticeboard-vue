@@ -20,7 +20,8 @@
 
  <el-row id="products" row style="margin-top:3%">
     <el-col id="store-col" :span="6" v-for="(card,index) in cards" :key="index"   >
-      <v-card  id="card">
+      <router-link to="/Employeedetails" >
+      <v-card @click="showemployee(card,index)" id="card">
         <v-img st
           :src="card.cardholder_image"
           height="213px"
@@ -44,6 +45,7 @@
 
        </div>
       </v-card>
+      </router-link>
     </el-col>
   </el-row>
 
@@ -69,9 +71,14 @@ export default {
     searchquery: "";
   },
   computed: {
-    ...mapState(["current_emp_id"])
+    ...mapState(["current_emp_id", "clicked_card_details"])
   },
   methods: {
+    showemployee: function(card, index) {
+      this.$store.state.clicked_card_details = [];
+      this.$store.state.clicked_card_details.push(this.cards[index]);
+      console.log(this.$store.state.clicked_card_details);
+    },
     searchcard: function() {
       this.cards = this.cards.filter(
         cards =>
@@ -215,6 +222,9 @@ export default {
 
 #navbar .el-col {
   margin-top: 1%;
+}
+a {
+  text-decoration: none;
 }
 
 #inputsearch {

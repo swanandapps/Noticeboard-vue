@@ -8,7 +8,8 @@ export default new Vuex.Store({
 
         current_emp_id: '',
         current_employee: [],
-        current_doc_id:''
+        current_doc_id: '',
+        clicked_card_details: []
 
     },
     mutations: {},
