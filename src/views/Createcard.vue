@@ -148,7 +148,7 @@ export default {
                 console.log(tempthis.count);
               });
 
-              tempthis.$swal("Sucess!", "Card Added to Dashboard!", "success");
+              tempthis.$swal("Success!", "Card Added to Dashboard!", "success");
             });
 
           console.log("Document successfully written!");

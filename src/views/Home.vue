@@ -20,13 +20,15 @@
 
  <el-row id="products" row style="margin-top:3%">
     <el-col id="store-col" :span="6" v-for="(card,index) in cards" :key="index"   >
-      <router-link to="/Employeedetails" >
+     
       <v-card @click="showemployee(card,index)" id="card">
+        <router-link to="/dashboard" >
         <v-img st
           :src="card.cardholder_image"
           height="213px"
         >
         </v-img>
+         </router-link>
 
         <v-card-title primary-title>
         
@@ -45,7 +47,7 @@
 
        </div>
       </v-card>
-      </router-link>
+     
     </el-col>
   </el-row>
 
@@ -65,7 +67,8 @@ export default {
     return {
       show: false,
       cards: [],
-      flag: 0
+      flag: 0,
+      card_id: ""
     };
 
     searchquery: "";
@@ -77,7 +80,7 @@ export default {
     showemployee: function(card, index) {
       this.$store.state.clicked_card_details = [];
       this.$store.state.clicked_card_details.push(this.cards[index]);
-      console.log(this.$store.state.clicked_card_details);
+      //console.log(this.$store.state.clicked_card_details);
     },
     searchcard: function() {
       this.cards = this.cards.filter(
@@ -135,34 +138,45 @@ export default {
       console.log(this.cards);
     },
     remove: function(card, index) {
+      this.card_id = card.id;
+      let tempthis = this;
+      console.log(tempthis.card_id);
+
       this.cards.splice(index, 1);
-      console.log(this.cards);
-      var card_query = db
-        .collection("Card")
-        .where("tasktitle", "==", card.tasktitle);
-      card_query.get().then(function(querySnapshot) {
-        querySnapshot.forEach(function(doc) {
-          doc.ref.delete();
+
+      db.collection("Card")
+        .doc(tempthis.card_id)
+        .delete()
+        .then(function() {
+          console.log("Document successfully deleted!");
+        })
+        .catch(function(error) {
+          console.error("Error removing document: ", error);
         });
-      });
     }
   },
 
   created() {
-    var cards = this.cards;
-    console.log(this.$store.state.current_emp_id);
+    console.log("home view created");
+    let tempthis = this;
+    var cards = tempthis.cards;
+    //console.log(this.$store.state.current_emp_id);
     console.log(this.cards);
-    1;
 
     db.collection("Card")
       .get()
       .then(function(DocumentSnapshot) {
+        let count = 0;
         DocumentSnapshot.forEach(function(doc) {
           // doc.data() is never undefined for query doc snapshots
           var data = doc.data();
 
           cards.push(data);
+          cards[count].id = doc.id;
+
+          count++;
         });
+        console.log(cards);
       });
   }
 };

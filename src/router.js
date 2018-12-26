@@ -1,7 +1,7 @@
 import Vue from "vue";
 import Router from "vue-router";
 import Home from "./views/Home.vue";
-import Employeedetails from './views/Employeedetails.vue'
+import dashboard from './views/Dashboard.vue';
 
 Vue.use(Router);
 
@@ -24,13 +24,11 @@ export default new Router({
         },
 
         {
-            path: '/employeedetails',
-            name: "Employeedetails",
+            path: '/dashboard',
+            name: "dashboard",
 
             component: () =>
-                import ( /* webpackChunkName: "about" */ "./views/Employeedetails.vue")
-
-
+                import ( /* webpackChunkName: "about" */ "./views/Dashboard.vue")
         }
     ]
 });
