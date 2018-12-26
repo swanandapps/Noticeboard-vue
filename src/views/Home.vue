@@ -159,7 +159,7 @@ export default {
   created() {
     console.log("home view created");
     let tempthis = this;
-    var cards = tempthis.cards;
+
     //console.log(this.$store.state.current_emp_id);
     console.log(this.cards);
 
@@ -171,8 +171,8 @@ export default {
           // doc.data() is never undefined for query doc snapshots
           var data = doc.data();
 
-          cards.push(data);
-          cards[count].id = doc.id;
+          tempthis.cards.push(data);
+          tempthis.cards[count].id = doc.id;
 
           count++;
         });
