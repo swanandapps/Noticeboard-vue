@@ -1,6 +1,6 @@
 <template>
 
-<div>
+<div style="    margin-top: -15px;">
 
 <el-row id="navbar" >
   <el-col  style="width:35%"><div class="grid-content bg-purple"><span id="nbtext"><b >NoticeBoard</b></span> <br> <span id="nbtext2">Designed and Developed by Swanand</span> </div></el-col>
@@ -176,7 +176,6 @@ export default {
 
           count++;
         });
-        console.log(cards);
       });
   }
 };

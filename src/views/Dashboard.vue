@@ -1,7 +1,13 @@
 <template>
     <div>
         
-hiiii
+      
+<el-row id="navbar" >
+  
+  <el-col style="width:45%" >
+    {{this.$store.state.clicked_card_details[0]}}
+  </el-col>
+</el-row>
 
 
     </div>
