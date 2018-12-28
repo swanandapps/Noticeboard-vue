@@ -88,7 +88,8 @@ export default {
       projectname: "",
       timestamp: ""
     },
-    count: 1
+
+    count: 0
   }),
   computed: {
     ...mapState(["current_emp_id", "current_employee", "current_doc_id"])
@@ -133,52 +134,46 @@ export default {
         })
         .then(function() {
           //Counting Number of Cards CREATED by employee
-
-          db.collection("Employees")
-            .where("id", "==", tempthis.$store.state.current_emp_id)
-            .get()
-            .then(function(DocumentSnapshot) {
-              DocumentSnapshot.forEach(function(doc) {
-                // doc.data() is never undefined for query doc snapshots
-                {
-                  var data = doc.data();
-                }
-                tempthis.count = data.cards_created + 1;
-
-                console.log(tempthis.count);
-              });
-
-              tempthis.$swal("Success!", "Card Added to Dashboard!", "success");
-            });
-
-          console.log("Document successfully written!");
-
-          var update_cards = db
-            .collection("Employees")
-            .doc(tempthis.$store.state.current_doc_id);
-
-          return update_cards.update({
-            cards_created: tempthis.count
-          });
+          tempthis.$swal("Success!", "Card Added to Dashboard!", "success");
+          console.log("Successfully added");
         })
         .catch(function(error) {
           console.error("Error writing document: ", error);
         });
-    },
 
-    // Clear form data
-    clear() {
-      this.$v.$reset();
-      this.name = "";
-      this.price = "";
-      this.description = "";
-      this.image = "";
-      this.type = "";
-      this.select = null;
-      this.checkbox = false;
+      //updating cards_created
+      tempthis.count = tempthis.$store.state.current_employee[0].cards_created;
+
+      var update_cards = db
+        .collection("Employees")
+        .doc(tempthis.$store.state.current_doc_id);
+      //console.log(tempthis.count);
+
+      return update_cards
+        .update({
+          cards_created: tempthis.count + 1
+        })
+        .then(function() {
+          console.log("Document successfully updated!");
+        })
+        .catch(function(error) {
+          // The document probably doesn't exist.
+          console.error("Error updating document: ", error);
+        });
     }
   },
 
+  // Clear form data
+  clear() {
+    this.$v.$reset();
+    this.name = "";
+    this.price = "";
+    this.description = "";
+    this.image = "";
+    this.type = "";
+    this.select = null;
+    this.checkbox = false;
+  },
   created() {
     //Get Current Employee data from database using employee id accepted on home.vue
     this.$store.state.current_employee = [];
