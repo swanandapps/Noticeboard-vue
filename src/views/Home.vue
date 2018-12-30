@@ -3,7 +3,7 @@
 <div style="    margin-top: -15px;">
 
 <el-row id="navbar" >
-  <el-col  style="width:35%"><div class="grid-content bg-purple"><span id="nbtext"><b >NoticeBoard</b></span> <br> <span id="nbtext2">Designed and Developed by Swanand</span> </div></el-col>
+  <el-col  style="width:35%"><div class="grid-content bg-purple"><span id="nbtext"><b > NoticeBoard</b></span> <br> <span id="nbtext2">Designed and Developed by Swanand</span> </div></el-col>
   <el-col style="width:45%" >
 
 <input type="search" v-model="searchquery" name="Search" id="inputsearch">
@@ -13,7 +13,7 @@
   <el-col style="width:20%">
     <div class="grid-content bg-purple">
       
-      <v-icon @click="createcard()" id="createicon">create</v-icon>
+      <v-icon @click="createcard()" id="createicon">create </v-icon>
       </div>
       </el-col>
 </el-row>
@@ -21,11 +21,12 @@
  <el-row id="products" row style="margin-top:3%">
     <el-col id="store-col" :span="6" v-for="(card,index) in cards" :key="index"   >
      
-      <v-card @click="showemployee(card,index)" id="card">
+     
+      <v-card   @click="showemployee(card,index)" id="card">
         <router-link to="/dashboard" >
         <v-img st
           :src="card.cardholder_image"
-          height="213px"
+          height="223px"
         >
         </v-img>
          </router-link>
@@ -42,12 +43,33 @@
        <div class="actions">
         
         <v-icon @click="remove(card,index);">delete</v-icon>
-         
-          <div class="deadline"> <span style="color:rgb(248, 148, 148)"> Deadline</span> - {{card.deadline}} Days</div>
 
-       </div>
+       <!-- {{current_timestamp - card.timestamp.seconds}}
+        
+         hii -{{ z= (( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60)}}
+       
+       {{z}}-->
+        
+       <!--   <div class="deadline"> <span style="color:rgb(248, 148, 148)"> Deadline</span>  Days</div>-->
+         
+
+       </div> <el-tooltip class="item" effect="dark" content="Time Remaining" placement="top">
+  
+
+       <el-progress v-if=" (( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60) < 100 "  style="margin-top:2%" :percentage=" (( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60)" status="success">
+       
+       </el-progress>
+       
+    </el-tooltip>
+    <el-tooltip class="item" effect="dark" content="This Task Missed the Deadline" placement="top">
+       <el-progress v-if =" (( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60) >100" :percentage=" (( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60)" status="exception"></el-progress>
+     </el-tooltip>
+<div>
+ 
+</div>
+  
       </v-card>
-     
+    
     </el-col>
   </el-row>
 
@@ -68,7 +90,9 @@ export default {
       show: false,
       cards: [],
       flag: 0,
-      card_id: ""
+      card_id: "",
+      current_timestamp: "",
+      x: 0
     };
 
     searchquery: "";
@@ -157,6 +181,13 @@ export default {
   },
 
   created() {
+    console.log(this);
+    var date = new Date();
+    this.current_timestamp = db.app.firebase_.firestore.Timestamp.fromDate(
+      date
+    ).seconds;
+
+    console.log(this.$data.current_timestamp);
     console.log("home view created");
     let tempthis = this;
 
@@ -202,7 +233,7 @@ export default {
   margin-left: 5%;
 }
 #desc {
-  height: 90px;
+  height: 50px;
   text-align: left;
   padding-left: 6%;
   font-family: "Raleway", sans-serif;
