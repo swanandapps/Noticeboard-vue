@@ -19,7 +19,7 @@
 </el-row>
 
  <el-row id="products" row style="margin-top:3%">
-    <el-col id="store-col" :span="6" v-for="(card,index) in cards" :key="index"   >
+    <el-col id="store-col" :span="6" v-for="(card,index) in live_cards" :key="index"   >
      
      
       <v-card   @click="showemployee(card,index)" id="card">
@@ -92,26 +92,31 @@ export default {
       flag: 0,
       card_id: "",
       current_timestamp: "",
-      x: 0
+      x: 0,
+      cards_length:0,
+      live_length:0
     };
 
     searchquery: "";
   },
   computed: {
-    ...mapState(["current_emp_id", "clicked_card_details"])
+    ...mapState(["current_emp_id", "clicked_card_details","live_cards","expired_cards"])
   },
   methods: {
     showemployee: function(card, index) {
+   
+
+
       this.$store.state.clicked_card_details = [];
-      this.$store.state.clicked_card_details.push(this.cards[index]);
+      this.$store.state.clicked_card_details.push(this.$store.state.live_cards[index]);
       //console.log(this.$store.state.clicked_card_details);
     },
     searchcard: function() {
-      this.cards = this.cards.filter(
+      this.$store.state.live_cards = this.$store.state.live_cards.filter(
         cards =>
           cards.cardholder.toLowerCase() == this.searchquery.toLowerCase()
       );
-      if (this.cards.length == 0) {
+      if (this.$store.state.live_cards.length == 0) {
         this.$swal({
           type: "error",
           title: "Card Not Found",
@@ -159,14 +164,14 @@ export default {
     },
 
     showcard: function() {
-      console.log(this.cards);
+      console.log(this.$store.state.live_cards);
     },
     remove: function(card, index) {
       this.card_id = card.id;
       let tempthis = this;
       console.log(tempthis.card_id);
 
-      this.cards.splice(index, 1);
+      this.$store.state.live_cards.splice(index, 1);
 
       db.collection("Card")
         .doc(tempthis.card_id)
@@ -181,7 +186,12 @@ export default {
   },
 
   created() {
-    console.log(this);
+
+
+    this.$store.state.live_cards =[]
+    this.$store.state.expired_cards=[]    
+   
+    
     var date = new Date();
     this.current_timestamp = db.app.firebase_.firestore.Timestamp.fromDate(
       date
@@ -192,7 +202,7 @@ export default {
     let tempthis = this;
 
     //console.log(this.$store.state.current_emp_id);
-    console.log(this.cards);
+   
 
     db.collection("Card")
       .get()
@@ -202,12 +212,35 @@ export default {
           // doc.data() is never undefined for query doc snapshots
           var data = doc.data();
 
-          tempthis.cards.push(data);
-          tempthis.cards[count].id = doc.id;
+          tempthis.$store.state.live_cards.push(data)
+          tempthis.$store.state.live_cards[count].id = doc.id;
 
           count++;
         });
+       
+      //Finding Out Expired Cards
+         tempthis.$store.state.live_cards.forEach(element => {
+           
+         let a= element.deadline*24*60*60
+
+          let b= element.timestamp.seconds
+
+          let c= tempthis.current_timestamp
+
+           if(a +b < c){
+
+             console.log(element)
+
+             tempthis.$store.state.expired_cards.push(element)
+
+             console.log("expired" ,  tempthis.$store.state.expired_cards)
+
+           }
+         });
       });
+
+
+    
   }
 };
 </script>

@@ -17,8 +17,8 @@
                          {{this.current_employee[0].cards_created}}
                          
                       </div>
-                      <div style="margin-top:8%;font-size:120%">  Cards Created </div>
-                    
+                      <div style="margin-top:8%;font-size:120%"> Total Cards Created </div>
+                     Live Cards :{{live_length}}
                     </div>
                
                 </v-flex>
@@ -121,7 +121,8 @@ import db from "../components/firebaseinit.js";
 export default {
   data() {
     return {
-      current_employee: []
+      current_employee: [],
+      live_length:0
     };
   },
 
@@ -130,6 +131,17 @@ export default {
   },
 
   created() {
+
+     let z = this.$store.state.clicked_card_details[0].cardholder
+    console.log(this.$store.state.live_cards)
+
+    var marvelHeroes =  this.$store.state.live_cards.filter(function(card) {
+	return  card.cardholder == z;
+});
+
+this.live_length =  marvelHeroes.length
+
+console.log(this.live_length)
     console.log(this.$store.state.clicked_card_details);
     let tempthis = this;
     db.collection("Employees")

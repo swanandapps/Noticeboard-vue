@@ -9,7 +9,9 @@ export default new Vuex.Store({
         current_emp_id: '',
         current_employee: [],
         current_doc_id: '',
-        clicked_card_details: []
+        clicked_card_details: [],
+        live_cards :[],
+        expired_cards:[]
 
     },
     mutations: {},

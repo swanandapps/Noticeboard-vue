@@ -142,6 +142,7 @@ export default {
         });
 
       //updating cards_created
+      
       tempthis.count = tempthis.$store.state.current_employee[0].cards_created;
 
       var update_cards = db
