@@ -18,15 +18,36 @@
       </el-col>
 </el-row>
 
- <el-row id="products" row style="margin-top:3%">
+ <el-row id="products" row style="margin-top:-2%">
+ 
+  
     <el-col id="store-col" :span="6" v-for="(card,index) in live_cards" :key="index"   >
      
-     
-      <v-card   @click="showemployee(card,index)" id="card">
+       <el-row>
+
+         <el-col :span="18">
+    
+      <el-progress color="orange" style="margin-left:6%" :percentage="card.card_completion"></el-progress>
+
+    </el-col>
+    <el-col :span="6" width="30">
+    <v-icon @click="addprogress(card,index)" style="margin-bottom:4%; cursor:pointer">add_box</v-icon>
+    </el-col>
+
+
+  
+    
+    
+    </el-row>
+   
+      <v-card style="border: solid white 2px"   @click="showemployee(card,index)" id="card">
         <router-link to="/dashboard" >
-        <v-img st
+        <v-img style="left: 1%;
+    
+    margin-top: 1%;"
           :src="card.cardholder_image"
-          height="223px"
+          height="220px"
+          width="98%"
         >
         </v-img>
          </router-link>
@@ -43,33 +64,109 @@
        <div class="actions">
         
         <v-icon @click="remove(card,index);">delete</v-icon>
-
-       <!-- {{current_timestamp - card.timestamp.seconds}}
+ 
+      <!--  {{Math.ceil(((card.deadline*24*60*60 +  card.timestamp.seconds) - current_timestamp)/86400)}}
         
-         hii -{{ z= (( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60)}}
+        hii -{{ z= (( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60)}}
        
        {{z}}-->
         
-       <!--   <div class="deadline"> <span style="color:rgb(248, 148, 148)"> Deadline</span>  Days</div>-->
-         
+       <div v-if="Math.ceil(((card.deadline*24*60*60 +  card.timestamp.seconds) - current_timestamp)/86400) > 1" class="deadline"> <span style="color:rgb(248, 148, 148)"> Deadline - </span>{{Math.ceil(((card.deadline*24*60*60 +  card.timestamp.seconds) - current_timestamp)/86400)}} Days Left</div>
+<div style="font-size: 15px;
+    font-family: 'Raleway', sans-serif" v-if="Math.ceil(((card.deadline*24*60*60 +  card.timestamp.seconds) - current_timestamp)/86400) == 1" class="deadline"> <span style="    font-weight: 900;
+    color: rgb(248, 148, 148);"> Deadline - </span>{{Math.ceil(((card.deadline*24*60*60 +  card.timestamp.seconds) - current_timestamp)/86000)*24}} Hours Left</div>         
 
-       </div> <el-tooltip class="item" effect="dark" content="Time Remaining" placement="top">
+<div v-if="Math.ceil(((card.deadline*24*60*60 +  card.timestamp.seconds) - current_timestamp)/86400) <= 0" class="deadline"> <span style="color:rgb(248, 148, 148)">Card Expired </span></div>
+
+       </div> 
+
+      
+      <!-- Different Deadline progress bar depending upon percentage like 25 50 75 and 100
+
+
+     <el-tooltip class="item" effect="dark" content="Time Remaining" placement="top">
   
 
-       <el-progress v-if=" (( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60) < 100 "  style="margin-top:2%" :percentage=" (( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60)" status="success">
+       <el-progress color="green"  style="margin-top:2%;color: green;" v-if=" Math.round(100 -(( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60)) > 75 && Math.round(100 -(( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60))<100 "   :percentage=" Math.round(100 -(( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60))" >
        
        </el-progress>
        
     </el-tooltip>
-    <el-tooltip class="item" effect="dark" content="This Task Missed the Deadline" placement="top">
-       <el-progress v-if =" (( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60) >100" :percentage=" (( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60)" status="exception"></el-progress>
-     </el-tooltip>
+
+   <el-tooltip class="item" effect="dark" content="Time Remaining" placement="top">
+  
+
+       <el-progress color="yellow"  style="margin-top:2%;color: green;" v-if="Math.round(100 -(( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60)) > 50 && Math.round(100 -(( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60))<75 "   :percentage=" Math.round(100 -(( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60))" >
+       
+       </el-progress>
+       
+    </el-tooltip>
+
+     <el-tooltip class="item" effect="dark" content="Time Remaining" placement="top">
+  
+
+       <el-progress color="orange"  style="margin-top:2%;color: green;" v-if=" Math.round(100 -(( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60)) > 25 && Math.round(100 -(( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60))<50 "   :percentage=" Math.round(100 -(( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60))" >
+       
+       </el-progress>
+       
+    </el-tooltip>
+
+     <el-tooltip class="item" effect="dark" content="Time Remaining" placement="top">
+  
+
+       <el-progress color="red"  style="margin-top:2%;color: green;" v-if=" Math.round(100 -(( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60)) > 0 && Math.round(100 -(( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60))< 25  "   :percentage=" Math.round(100 -(( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60))" >
+       
+       </el-progress>
+       
+    </el-tooltip>
+-->
+
 <div>
  
 </div>
+
   
       </v-card>
-    
+  <el-row>  
+<el-col style="margin-left:6%" :span="22">
+ <el-tooltip class="item" effect="dark" content="Time Remaining" placement="top">
+  
+
+       <el-progress color="green"  style="margin-top:2%;color: green;" v-if=" Math.round(100 -(( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60)) > 75 && Math.round(100 -(( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60))<100 "   :percentage=" Math.round(100 -(( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60))" >
+       
+       </el-progress>
+       
+    </el-tooltip>
+
+   <el-tooltip class="item" effect="dark" content="Time Remaining" placement="top">
+  
+
+       <el-progress color="yellow"  style="margin-top:2%;color: green;" v-if="Math.round(100 -(( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60)) > 50 && Math.round(100 -(( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60))<75 "   :percentage=" Math.round(100 -(( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60))" >
+       
+       </el-progress>
+       
+    </el-tooltip>
+
+     <el-tooltip class="item" effect="dark" content="Time Remaining" placement="top">
+  
+
+       <el-progress color="orange"  style="margin-top:2%;color: green;" v-if=" Math.round(100 -(( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60)) > 25 && Math.round(100 -(( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60))<50 "   :percentage=" Math.round(100 -(( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60))" >
+       
+       </el-progress>
+       
+    </el-tooltip>
+
+     <el-tooltip class="item" effect="dark" content="Time Remaining" placement="top">
+  
+
+       <el-progress color="red"  style="margin-top:2%;color: green;" v-if=" Math.round(100 -(( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60)) > 0 && Math.round(100 -(( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60))< 25  "   :percentage=" Math.round(100 -(( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60))" >
+       
+       </el-progress>
+       
+    </el-tooltip>
+
+ </el-col>
+</el-row>
     </el-col>
   </el-row>
 
@@ -94,7 +191,8 @@ export default {
       current_timestamp: "",
       x: 0,
       cards_length:0,
-      live_length:0
+      live_length:0,
+     
     };
 
     searchquery: "";
@@ -103,6 +201,37 @@ export default {
     ...mapState(["current_emp_id", "clicked_card_details","live_cards","expired_cards"])
   },
   methods: {
+
+    addprogress: function(card,index){
+
+ let x = card.id
+      card.card_completion+=25
+       
+       
+
+   
+
+
+    
+     var update_progress = db
+        .collection("Card")
+        .doc(x);
+      //console.log(tempthis.count);
+
+      return update_progress
+        .update({
+          card_completion:  card.card_completion
+        })
+        .then(function() {
+          console.log("Document successfully updated!");
+        })
+        .catch(function(error) {
+          // The document probably doesn't exist.
+          console.error("Error updating document: ", error);
+        });
+       
+
+    },
     showemployee: function(card, index) {
    
 
@@ -249,6 +378,11 @@ export default {
 <style scoped>
 @import url("https://fonts.googleapis.com/css?family=Raleway|Roboto");
 @import url("https://unpkg.com/element-ui/lib/theme-chalk/index.css");
+
+
+.deadline{
+      align-self: center;
+}
 #products {
   width: 100%;
 }
@@ -266,7 +400,7 @@ export default {
   margin-left: 5%;
 }
 #desc {
-  height: 50px;
+  height: 90px;
   text-align: left;
   padding-left: 6%;
   font-family: "Raleway", sans-serif;
@@ -280,14 +414,12 @@ export default {
 #card {
   width: 85%;
   margin-left: 7%;
-  box-shadow: 0 0 8px 0px black;
-  height: 400px;
+ box-shadow: 3px 3px 5px 6px rgb(218, 214, 214);
+  height: 430px;
   padding: 0px;
+  
 }
-#card:hover {
-  transform: scale(1.05);
-  transition: 0.2s ease-in;
-}
+
 #navbar {
   width: 100%;
   display: inline-flex;
@@ -369,6 +501,7 @@ a {
 @media screen and (min-width: 1025px) and (max-width: 1400px) {
   #store-col {
     width: 25%;
+    margin-top:5%
   }
 }
 </style>

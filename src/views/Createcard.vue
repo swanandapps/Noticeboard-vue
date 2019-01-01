@@ -86,7 +86,8 @@ export default {
       groupid: "",
 
       projectname: "",
-      timestamp: ""
+      timestamp: "",
+      card_completion:0
     },
 
     count: 0
@@ -130,7 +131,8 @@ export default {
 
           tasktitle: this.card.tasktitle,
           cardholder_image: this.$store.state.current_employee[0].image,
-          timestamp: tempthis.timestamp
+          timestamp: tempthis.timestamp,
+          card_completion:0
         })
         .then(function() {
           //Counting Number of Cards CREATED by employee
@@ -142,7 +144,7 @@ export default {
         });
 
       //updating cards_created
-      
+
       tempthis.count = tempthis.$store.state.current_employee[0].cards_created;
 
       var update_cards = db
