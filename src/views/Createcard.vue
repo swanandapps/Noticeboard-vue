@@ -87,13 +87,17 @@ export default {
 
       projectname: "",
       timestamp: "",
-      card_completion:0
+      card_completion:0,
+      cardholder_id :'',
+       department:''
     },
+
+   
 
     count: 0
   }),
   computed: {
-    ...mapState(["current_emp_id", "current_employee", "current_doc_id"])
+    ...mapState([ "current_employee", "current_doc_id","current_emp_id"])
   },
   mixins: [validationMixin],
 
@@ -132,7 +136,9 @@ export default {
           tasktitle: this.card.tasktitle,
           cardholder_image: this.$store.state.current_employee[0].image,
           timestamp: tempthis.timestamp,
-          card_completion:0
+          card_completion:0,
+          cardholder_id: tempthis.$store.state.current_emp_id,
+          department: this.$store.state.current_employee[0].department
         })
         .then(function() {
           //Counting Number of Cards CREATED by employee

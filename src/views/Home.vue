@@ -3,7 +3,7 @@
 <div style="    margin-top: -15px;">
 
 <el-row id="navbar" >
-  <el-col  style="width:35%"><div class="grid-content bg-purple"><span id="nbtext"><b > NoticeBoard</b></span> <br> <span id="nbtext2">Designed and Developed by Swanand</span> </div></el-col>
+  <el-col  style="width:35%"><div class="grid-content bg-purple"><span id="nbtext"><b > NoticeBoard - </b> {{id}}</span> <br> <span id="nbtext2">Designed and Developed by Swanand</span> </div></el-col>
   <el-col style="width:45%" >
 
 <input type="search" v-model="searchquery" name="Search" id="inputsearch">
@@ -21,13 +21,13 @@
  <el-row id="products" row style="margin-top:-2%">
  
   
-    <el-col id="store-col" :span="6" v-for="(card,index) in live_cards" :key="index"   >
+    <el-col id="store-col" :span="6" v-for="(card,index) in department_cards" :key="index"   >
      
        <el-row>
 
          <el-col :span="18">
     
-      <el-progress color="orange" style="margin-left:6%" :percentage="card.card_completion"></el-progress>
+      <el-progress color="green" style="margin-left:6%" :percentage="card.card_completion"></el-progress>
 
     </el-col>
     <el-col :span="6" width="30">
@@ -61,20 +61,22 @@
         </v-card-title>
         <div  id="desc">{{card.description}}</div>
 
+
+
        <div class="actions">
         
         <v-icon @click="remove(card,index);">delete</v-icon>
  
-      <!--  {{Math.ceil(((card.deadline*24*60*60 +  card.timestamp.seconds) - current_timestamp)/86400)}}
+  <!-- {{(((card.deadline*24*60*60 +  card.timestamp.seconds) - current_timestamp)/86400)*24}}
         
-        hii -{{ z= (( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60)}}
+             hii -{{ z= (( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60)}}
        
        {{z}}-->
         
        <div v-if="Math.ceil(((card.deadline*24*60*60 +  card.timestamp.seconds) - current_timestamp)/86400) > 1" class="deadline"> <span style="color:rgb(248, 148, 148)"> Deadline - </span>{{Math.ceil(((card.deadline*24*60*60 +  card.timestamp.seconds) - current_timestamp)/86400)}} Days Left</div>
 <div style="font-size: 15px;
     font-family: 'Raleway', sans-serif" v-if="Math.ceil(((card.deadline*24*60*60 +  card.timestamp.seconds) - current_timestamp)/86400) == 1" class="deadline"> <span style="    font-weight: 900;
-    color: rgb(248, 148, 148);"> Deadline - </span>{{Math.ceil(((card.deadline*24*60*60 +  card.timestamp.seconds) - current_timestamp)/86000)*24}} Hours Left</div>         
+    color: rgb(248, 148, 148);"> Deadline - </span>{{((((card.deadline*24*60*60 +  card.timestamp.seconds) - current_timestamp)/86000)*24).toString().slice(0,3)}} Hours Left</div>         
 
 <div v-if="Math.ceil(((card.deadline*24*60*60 +  card.timestamp.seconds) - current_timestamp)/86400) <= 0" class="deadline"> <span style="color:rgb(248, 148, 148)">Card Expired </span></div>
 
@@ -132,7 +134,7 @@
  <el-tooltip class="item" effect="dark" content="Time Remaining" placement="top">
   
 
-       <el-progress color="green"  style="margin-top:2%;color: green;" v-if=" Math.round(100 -(( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60)) > 75 && Math.round(100 -(( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60))<100 "   :percentage=" Math.round(100 -(( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60))" >
+       <el-progress color="#6fc52d"  style="margin-top:2%;color: green;" v-if=" Math.round(100 -(( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60)) > 75 && Math.round(100 -(( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60))<100 "   :percentage=" Math.round(100 -(( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60))" >
        
        </el-progress>
        
@@ -192,13 +194,20 @@ export default {
       x: 0,
       cards_length:0,
       live_length:0,
+      id
      
     };
 
     searchquery: "";
   },
+
+ 
+  
   computed: {
-    ...mapState(["current_emp_id", "clicked_card_details","live_cards","expired_cards"])
+    
+    
+    
+    ...mapState(["current_emp_id","current_dep_id", "clicked_card_details","live_cards","expired_cards","department_cards"])
   },
   methods: {
 
@@ -257,6 +266,7 @@ export default {
       }
     },
     createcard: function() {
+      
       var tempthis = this;
       tempthis.flag = 0;
 
@@ -268,6 +278,8 @@ export default {
         tempthis.$store.state.current_emp_id = ID.value;
         console.log(tempthis.$store.state.current_emp_id);
 
+
+//Find if Employee Exist or Not in Database
         db.collection("Employees")
           .where("id", "==", ID.value)
           .get()
@@ -298,9 +310,9 @@ export default {
     remove: function(card, index) {
       this.card_id = card.id;
       let tempthis = this;
-      console.log(tempthis.card_id);
+      console.log(card.id);
 
-      this.$store.state.live_cards.splice(index, 1);
+      this.$store.state.department_cards.splice(index, 1);
 
       db.collection("Card")
         .doc(tempthis.card_id)
@@ -311,12 +323,15 @@ export default {
         .catch(function(error) {
           console.error("Error removing document: ", error);
         });
+    
     }
   },
 
   created() {
-
-
+    this.id=localStorage.getItem('dep_id')
+console.log(this.id)
+    this.$store.state.department_cards= []
+      
     this.$store.state.live_cards =[]
     this.$store.state.expired_cards=[]    
    
@@ -330,8 +345,35 @@ export default {
     console.log("home view created");
     let tempthis = this;
 
-    //console.log(this.$store.state.current_emp_id);
-   
+    //console.log(this.$store.state.current_dep_id);
+db.collection("Card")
+          .where("department", "==", tempthis.id)
+          .get()
+          .then(function(DocumentSnapshot) {
+            let count=0
+            DocumentSnapshot.forEach(function(doc) {
+              // doc.data() is never undefined for query doc snapshots
+              {
+                var data = doc.data();
+               // console.log(data);
+                console.log(doc.id)
+               // tempthis.flag = 1;
+                // tempthis.$router.push("home");
+
+                 tempthis.$store.state.department_cards.push(data)
+                tempthis.$store.state.department_cards[count].id = doc.id
+
+                count++
+                
+              }
+
+             
+            })
+             console.log(tempthis.$store.state.department_cards)
+          })
+
+
+,
 
     db.collection("Card")
       .get()
@@ -358,11 +400,11 @@ export default {
 
            if(a +b < c){
 
-             console.log(element)
+            // console.log(element)
 
              tempthis.$store.state.expired_cards.push(element)
 
-             console.log("expired" ,  tempthis.$store.state.expired_cards)
+           //  console.log("expired" ,  tempthis.$store.state.expired_cards)
 
            }
          });
@@ -398,6 +440,13 @@ export default {
   display: flex;
   margin-top: 1%;
   margin-left: 5%;
+  height:25px
+}
+.line{
+
+  width:100%;
+  height:7px;
+ border-top: 1px solid rgba(0,0,0,.05);
 }
 #desc {
   height: 90px;
@@ -415,7 +464,7 @@ export default {
   width: 85%;
   margin-left: 7%;
  box-shadow: 3px 3px 5px 6px rgb(218, 214, 214);
-  height: 430px;
+  height: 440px;
   padding: 0px;
   
 }
@@ -461,7 +510,7 @@ a {
   cursor: pointer;
 }
 #nbtext {
-  margin-left: -50%;
+  margin-left: -35%;
   font-size: 150%;
 }
 #nbtext2 {
@@ -473,7 +522,7 @@ a {
   #store-col {
     width: 100%;
     height: 466px;
-    margin-top: 10%;
+    margin-top: 15%;
   }
   #products {
     width: 100%;
@@ -486,7 +535,7 @@ a {
   #store-col {
     width: 50%;
     height: 466px;
-    margin-top: 8%;
+    margin-top: 10%;
   }
 }
 
