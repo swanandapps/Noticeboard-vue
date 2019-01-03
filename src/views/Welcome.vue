@@ -22,6 +22,8 @@ export default {
   created() {
     //Get Current Employee data from database using employee id accepted on home.vue
 console.log(this)
+
+   
      this.$store.state.department_cards=[]
     
     let tempthis=this

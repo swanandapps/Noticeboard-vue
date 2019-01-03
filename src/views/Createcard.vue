@@ -144,6 +144,8 @@ export default {
           //Counting Number of Cards CREATED by employee
           tempthis.$swal("Success!", "Card Added to Dashboard!", "success");
           console.log("Successfully added");
+
+          tempthis.$router.push("home");
         })
         .catch(function(error) {
           console.error("Error writing document: ", error);
@@ -184,6 +186,9 @@ export default {
     this.checkbox = false;
   },
   created() {
+
+    this.$store.state.current_emp_id = localStorage.getItem('current_emp_id')
+    console.log(this.$store.state.current_emp_id)
     //Get Current Employee data from database using employee id accepted on home.vue
     this.$store.state.current_employee = [];
     console.log(this);

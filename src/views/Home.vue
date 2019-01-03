@@ -14,6 +14,7 @@
     <div class="grid-content bg-purple">
       
       <v-icon @click="createcard()" id="createicon">create </v-icon>
+     <!-- <img style="" :src="this.$store.state.current_employee[0].image"></img>-->
       </div>
       </el-col>
 </el-row>
@@ -21,17 +22,26 @@
  <el-row id="products" row style="margin-top:-2%">
  
   
-    <el-col id="store-col" :span="6" v-for="(card,index) in department_cards" :key="index"   >
+    <el-col  id="store-col" :span="6" v-for="(card,index) in department_cards" :key="index"   >
      
        <el-row>
 
          <el-col :span="18">
     
-      <el-progress color="green" style="margin-left:6%" :percentage="card.card_completion"></el-progress>
+      <el-progress v-if="card.card_completion<100" color="green" style="margin-left:6%" :percentage="card.card_completion"></el-progress>
+<el-progress  v-if="card.card_completion>=100" color="green" style="margin-left:6%;    margin-left: 6%;
+    width: 123%;
+  
+    margin-bottom: 2%;" :percentage="card.card_completion" status="success"></el-progress>
+<el-progress  v-if="Math.ceil(((card.deadline*24*60*60 +  card.timestamp.seconds) - current_timestamp)/86400) <= 0 && card.card_completion<100 "  style="margin-left:6%;    margin-left: 6%;
+    width: 123%;
+  
+    margin-bottom: 2%;" :percentage="card.card_completion" status="exception"></el-progress>
+
 
     </el-col>
     <el-col :span="6" width="30">
-    <v-icon @click="addprogress(card,index)" style="margin-bottom:4%; cursor:pointer">add_box</v-icon>
+    <v-icon v-if="card.card_completion<100" @click="addprogress(card,index)" style="margin-bottom:4%; cursor:pointer">add_box</v-icon>
     </el-col>
 
 
@@ -39,10 +49,12 @@
     
     
     </el-row>
-   
+        
+      
+       
       <v-card style="border: solid white 2px"   @click="showemployee(card,index)" id="card">
         <router-link to="/dashboard" >
-        <v-img style="left: 1%;
+        <v-img  style="left: 1%;
     
     margin-top: 1%;"
           :src="card.cardholder_image"
@@ -75,11 +87,32 @@
         
        <div v-if="Math.ceil(((card.deadline*24*60*60 +  card.timestamp.seconds) - current_timestamp)/86400) > 1" class="deadline"> <span style="color:rgb(248, 148, 148)"> Deadline - </span>{{Math.ceil(((card.deadline*24*60*60 +  card.timestamp.seconds) - current_timestamp)/86400)}} Days Left</div>
 <div style="font-size: 15px;
-    font-family: 'Raleway', sans-serif" v-if="Math.ceil(((card.deadline*24*60*60 +  card.timestamp.seconds) - current_timestamp)/86400) == 1" class="deadline"> <span style="    font-weight: 900;
+    font-family: 'Raleway', sans-serif" v-if="Math.ceil(((card.deadline*24*60*60 +  card.timestamp.seconds) - current_timestamp)/86400) == 1 && card.card_completion<100" class="deadline"> <span style="    font-weight: 900;
     color: rgb(248, 148, 148);"> Deadline - </span>{{((((card.deadline*24*60*60 +  card.timestamp.seconds) - current_timestamp)/86000)*24).toString().slice(0,3)}} Hours Left</div>         
 
-<div v-if="Math.ceil(((card.deadline*24*60*60 +  card.timestamp.seconds) - current_timestamp)/86400) <= 0" class="deadline"> <span style="color:rgb(248, 148, 148)">Card Expired </span></div>
+<div v-if="Math.ceil(((card.deadline*24*60*60 +  card.timestamp.seconds) - current_timestamp)/86400) <= 0 && card.card_completion<100" class="deadline"> <span style="color:rgb(248, 148, 148)">Card Expired </span></div>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div v-if="card.card_completion==100" class="deadline"> <span style="color:green;margin-left:3%"> Task Completed </span>  </div>
        </div> 
 
       
@@ -134,16 +167,16 @@
  <el-tooltip class="item" effect="dark" content="Time Remaining" placement="top">
   
 
-       <el-progress color="#6fc52d"  style="margin-top:2%;color: green;" v-if=" Math.round(100 -(( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60)) > 75 && Math.round(100 -(( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60))<100 "   :percentage=" Math.round(100 -(( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60))" >
+       <el-progress color="#6fc52d"  style="margin-top:2%;color: green;" v-if=" Math.round(100 -(( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60)) > 75 && Math.round(100 -(( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60))<=100 && card.card_completion !=100 "   :percentage=" Math.round(100 -(( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60))" >
        
        </el-progress>
-       
+       1
     </el-tooltip>
 
    <el-tooltip class="item" effect="dark" content="Time Remaining" placement="top">
   
 
-       <el-progress color="yellow"  style="margin-top:2%;color: green;" v-if="Math.round(100 -(( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60)) > 50 && Math.round(100 -(( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60))<75 "   :percentage=" Math.round(100 -(( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60))" >
+       <el-progress color="yellow"  style="margin-top:2%;color: green;" v-if=" Math.round(100 -(( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60)) > 50 && Math.round(100 -(( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60))<75  && card.card_completion!=100 "   :percentage=" Math.round(100 -(( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60))" >
        
        </el-progress>
        
@@ -152,7 +185,7 @@
      <el-tooltip class="item" effect="dark" content="Time Remaining" placement="top">
   
 
-       <el-progress color="orange"  style="margin-top:2%;color: green;" v-if=" Math.round(100 -(( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60)) > 25 && Math.round(100 -(( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60))<50 "   :percentage=" Math.round(100 -(( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60))" >
+       <el-progress color="orange"  style="margin-top:2%;color: green;" v-if=" Math.round(100 -(( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60)) > 25 && Math.round(100 -(( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60))<50  && card.card_completion!=100 "   :percentage=" Math.round(100 -(( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60))" >
        
        </el-progress>
        
@@ -161,7 +194,7 @@
      <el-tooltip class="item" effect="dark" content="Time Remaining" placement="top">
   
 
-       <el-progress color="red"  style="margin-top:2%;color: green;" v-if=" Math.round(100 -(( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60)) > 0 && Math.round(100 -(( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60))< 25  "   :percentage=" Math.round(100 -(( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60))" >
+       <el-progress color="red"  style="margin-top:2%;color: green;" v-if=" Math.round(100 -(( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60)) > 0 && Math.round(100 -(( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60))< 25  && card.card_completion !=100 "   :percentage=" Math.round(100 -(( current_timestamp - card.timestamp.seconds)*100)/(card.deadline*24*60*60))" >
        
        </el-progress>
        
@@ -186,6 +219,7 @@ export default {
   name: "home",
   data() {
     return {
+      bind:'false',
       show: false,
       cards: [],
       flag: 0,
@@ -207,7 +241,7 @@ export default {
     
     
     
-    ...mapState(["current_emp_id","current_dep_id", "clicked_card_details","live_cards","expired_cards","department_cards"])
+    ...mapState(["current_emp_id","current_dep_id", "clicked_card_details","live_cards","expired_cards","department_cards","current_employee"])
   },
   methods: {
 
@@ -244,17 +278,17 @@ export default {
     showemployee: function(card, index) {
    
 
-
+       
       this.$store.state.clicked_card_details = [];
-      this.$store.state.clicked_card_details.push(this.$store.state.live_cards[index]);
-      //console.log(this.$store.state.clicked_card_details);
+      this.$store.state.clicked_card_details.push(card);
+      console.log(this.$store.state.clicked_card_details);
     },
     searchcard: function() {
-      this.$store.state.live_cards = this.$store.state.live_cards.filter(
+      this.$store.state.department_cards = this.$store.state.department_cards.filter(
         cards =>
           cards.cardholder.toLowerCase() == this.searchquery.toLowerCase()
       );
-      if (this.$store.state.live_cards.length == 0) {
+      if (this.$store.state.department_cards.length == 0) {
         this.$swal({
           type: "error",
           title: "Card Not Found",
@@ -270,39 +304,79 @@ export default {
       var tempthis = this;
       tempthis.flag = 0;
 
-      this.$swal({
-        title: "Enter Employee ID",
-        input: "text",
-        allowEnterKey: true
-      }).then(function(ID) {
-        tempthis.$store.state.current_emp_id = ID.value;
-        console.log(tempthis.$store.state.current_emp_id);
+   
+       
+        
+      
+     /*  
+       else if( tempthis.$store.state.current_emp_id == ID.value ){
 
 
-//Find if Employee Exist or Not in Database
-        db.collection("Employees")
-          .where("id", "==", ID.value)
-          .get()
-          .then(function(DocumentSnapshot) {
-            DocumentSnapshot.forEach(function(doc) {
-              // doc.data() is never undefined for query doc snapshots
-              {
-                var data = doc.data();
-                console.log(data);
-                tempthis.flag = 1;
-                tempthis.$router.push("createcard");
-              }
-            });
-            if (tempthis.flag == 0) {
+
+        tempthis.$store.state.department_cards.forEach(function(element){
+
+            if(element.department==tempthis.$store.state.current_employee[0].department)
+            
+            {
+
+
+                  tempthis.$router.push("createcard");
+
+
+                      }
+
+                    
+
+                        else {
               tempthis.$swal({
                 type: "error",
                 title: "Oops...",
                 text: "This Employee ID Doesnt Exist!"
               });
-            }
-          });
+            }     
+            
+        })
+      })
+      }, */
+
+
+//Find if Employee Exist or Not in Database
+   console.log(tempthis.id)
+       this.$swal({
+        title: "Enter Employee ID",
+        input: "text",
+        allowEnterKey: true
+      }).then(function(ID) {
+        
+        db.collection("Employees").where("id", "==", ID.value)
+          .get().then(function(querySnapshot) {
+        querySnapshot.forEach(function(doc) {
+         
+
+    if (doc.data().department==tempthis.id) {
+        console.log("Document data:", doc.data().department);
+         localStorage.setItem('current_emp_id', ID.value)
+        tempthis.$store.state.current_emp_id = ID.value;
+        tempthis.$router.push("createcard");
+        console.log(tempthis.$store.state.current_emp_id);
+    } else {
+        // doc.data() will be undefined in this case
+        console.log("No such document!");
+         
+              tempthis.$swal({
+                type: "error",
+                title: "Sorry",
+                text: "You are not Allowed to Create Card in this Department!"
+              });
+            
+    }
+})
+          
+          }); 
+        
       });
     },
+    
 
     showcard: function() {
       console.log(this.$store.state.live_cards);
@@ -432,6 +506,10 @@ db.collection("Card")
   width: 34%;
   height: 466px;
 }
+.border{
+
+  border: red 2px solid
+}
 .title {
   text-align: left;
   font-family: "Roboto", sans-serif;
@@ -551,6 +629,10 @@ a {
   #store-col {
     width: 25%;
     margin-top:5%
+  }
+  .deadline{
+
+    margin-left:34%
   }
 }
 </style>
