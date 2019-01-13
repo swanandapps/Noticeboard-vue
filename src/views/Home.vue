@@ -2,12 +2,15 @@
 
 <div style="    margin-top: -15px;">
 
+
 <el-row id="navbar" >
-  <el-col  style="width:35%"><div class="grid-content bg-purple"><span id="nbtext"><b > NoticeBoard - </b> {{id}}</span> <br> <span id="nbtext2">Designed and Developed by Swanand</span> </div></el-col>
+  <el-col id="text"  style="width:35%"><div class="grid-content bg-purple"><span id="nbtext"><b > NoticeBoard - </b> {{id}}</span> <br> <span id="nbtext2">Designed and Developed by Swanand</span> </div></el-col>
   <el-col style="width:45%" >
 
 <input type="search" v-model="searchquery" name="Search" id="inputsearch">
 <v-icon @click="searchcard()" id="searchicon">search</v-icon>
+
+
 
 </el-col>
   <el-col style="width:20%">
@@ -19,10 +22,55 @@
       </el-col>
 </el-row>
 
+
+
+
+  
+ <v-tabs
+    dark
+    color="black"
+    show-arrows
+  >
+    <v-tabs-slider color="yellow"></v-tabs-slider>
+
+
+     <v-tab @click="showall()"  >
+       All Cards
+    </v-tab>
+   
+    
+   
+
+    <v-tab style="cursor:pointer;" @click="sortbyproject(project,index)"
+      v-for="(project,index) in projects" :key="index"
+      
+    >
+       {{ project.name }}
+    </v-tab>
+
+    <v-tabs-items>
+        <v-tab-item
+      
+      >
+        <v-card flat>
+         
+        </v-card>
+      </v-tab-item>
+      <v-tab-item
+      v-for="(project,index) in projects" :key="index"
+      >
+        
+      </v-tab-item>
+    </v-tabs-items>
+  </v-tabs>
+
+
+
+
  <el-row id="products" row style="margin-top:-2%">
  
   
-    <el-col  id="store-col" :span="6" v-for="(card,index) in department_cards" :key="index"   >
+    <el-col  id="store-col" :span="6" v-for="(card,index) in cards_project" :key="index"   >
      
        <el-row>
 
@@ -33,15 +81,15 @@
     width: 123%;
   
     margin-bottom: 2%;" :percentage="card.card_completion" status="success"></el-progress>
-<el-progress  v-if="Math.ceil(((card.deadline*24*60*60 +  card.timestamp.seconds) - current_timestamp)/86400) <= 0 && card.card_completion<100 "  style="margin-left:6%;    margin-left: 6%;
+<!--<el-progress  v-if="Math.ceil(((card.deadline*24*60*60 +  card.timestamp.seconds) - current_timestamp)/86400) <= 0 && card.card_completion<100 "  style="margin-left:6%;    margin-left: 6%;
     width: 123%;
   
-    margin-bottom: 2%;" :percentage="card.card_completion" status="exception"></el-progress>
+    margin-bottom: 2%;" :percentage="card.card_completion" status="exception"></el-progress>-->
 
 
     </el-col>
     <el-col :span="6" width="30">
-    <v-icon v-if="card.card_completion<100" @click="addprogress(card,index)" style="margin-bottom:4%; cursor:pointer">add_box</v-icon>
+    <v-icon v-if=" Math.ceil(((card.deadline*24*60*60 +  card.timestamp.seconds) - current_timestamp)/86400) >= 0 &&card.card_completion<100" @click="addprogress(card,index)" style="margin-bottom:4%; cursor:pointer">add_box</v-icon>
     </el-col>
 
 
@@ -85,30 +133,12 @@
        
        {{z}}-->
         
-       <div v-if="Math.ceil(((card.deadline*24*60*60 +  card.timestamp.seconds) - current_timestamp)/86400) > 1" class="deadline"> <span style="color:rgb(248, 148, 148)"> Deadline - </span>{{Math.ceil(((card.deadline*24*60*60 +  card.timestamp.seconds) - current_timestamp)/86400)}} Days Left</div>
+       <div v-if="Math.ceil(((card.deadline*24*60*60 +  card.timestamp.seconds) - current_timestamp)/86400) > 1 && card.card_completion<100" class="deadline"> <span style="color:rgb(248, 148, 148)"> Deadline - </span>{{Math.ceil(((card.deadline*24*60*60 +  card.timestamp.seconds) - current_timestamp)/86400)}} Days Left</div>
 <div style="font-size: 15px;
     font-family: 'Raleway', sans-serif" v-if="Math.ceil(((card.deadline*24*60*60 +  card.timestamp.seconds) - current_timestamp)/86400) == 1 && card.card_completion<100" class="deadline"> <span style="    font-weight: 900;
     color: rgb(248, 148, 148);"> Deadline - </span>{{((((card.deadline*24*60*60 +  card.timestamp.seconds) - current_timestamp)/86000)*24).toString().slice(0,3)}} Hours Left</div>         
 
 <div v-if="Math.ceil(((card.deadline*24*60*60 +  card.timestamp.seconds) - current_timestamp)/86400) <= 0 && card.card_completion<100" class="deadline"> <span style="color:rgb(248, 148, 148)">Card Expired </span></div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -219,51 +249,46 @@ export default {
   name: "home",
   data() {
     return {
-      bind:'false',
+      bind: "false",
+
       show: false,
       cards: [],
       flag: 0,
       card_id: "",
       current_timestamp: "",
       x: 0,
-      cards_length:0,
-      live_length:0,
+      cards_length: 0,
+      live_length: 0,
       id
-     
     };
 
     searchquery: "";
   },
 
- 
-  
   computed: {
-    
-    
-    
-    ...mapState(["current_emp_id","current_dep_id", "clicked_card_details","live_cards","expired_cards","department_cards","current_employee"])
+    ...mapState([
+      "current_emp_id",
+      "current_dep_id",
+      "clicked_card_details",
+      "live_cards",
+      "expired_cards",
+      "department_cards",
+      "current_employee",
+      "projects",
+      "cards_project"
+    ])
   },
   methods: {
+    addprogress: function(card, index) {
+      let x = card.id;
+      card.card_completion += 25;
 
-    addprogress: function(card,index){
-
- let x = card.id
-      card.card_completion+=25
-       
-       
-
-   
-
-
-    
-     var update_progress = db
-        .collection("Card")
-        .doc(x);
+      var update_progress = db.collection("Card").doc(x);
       //console.log(tempthis.count);
 
       return update_progress
         .update({
-          card_completion:  card.card_completion
+          card_completion: card.card_completion
         })
         .then(function() {
           console.log("Document successfully updated!");
@@ -272,19 +297,14 @@ export default {
           // The document probably doesn't exist.
           console.error("Error updating document: ", error);
         });
-       
-
     },
     showemployee: function(card, index) {
-   
-
-       
       this.$store.state.clicked_card_details = [];
       this.$store.state.clicked_card_details.push(card);
       console.log(this.$store.state.clicked_card_details);
     },
     searchcard: function() {
-      this.$store.state.department_cards = this.$store.state.department_cards.filter(
+      this.$store.state.cards_project = this.$store.state.cards_project.filter(
         cards =>
           cards.cardholder.toLowerCase() == this.searchquery.toLowerCase()
       );
@@ -300,15 +320,10 @@ export default {
       }
     },
     createcard: function() {
-      
       var tempthis = this;
       tempthis.flag = 0;
 
-   
-       
-        
-      
-     /*  
+      /*  
        else if( tempthis.$store.state.current_emp_id == ID.value ){
 
 
@@ -339,47 +354,63 @@ export default {
       })
       }, */
 
-
-//Find if Employee Exist or Not in Database
-   console.log(tempthis.id)
-       this.$swal({
+      //Find if Employee Exist or Not in Database
+      console.log(tempthis.id);
+      this.$swal({
         title: "Enter Employee ID",
         input: "text",
         allowEnterKey: true
       }).then(function(ID) {
-        
-        db.collection("Employees").where("id", "==", ID.value)
-          .get().then(function(querySnapshot) {
-        querySnapshot.forEach(function(doc) {
-         
+        db.collection("Employees")
+          .where("id", "==", ID.value)
+          .get()
+          .then(function(querySnapshot) {
+            querySnapshot.forEach(function(doc) {
+              if (doc.data().department == tempthis.id) {
+                console.log("Document data:", doc.data().department);
+                localStorage.setItem("current_emp_id", ID.value);
+                tempthis.$store.state.current_emp_id = ID.value;
+                tempthis.$router.push("createcard");
+                console.log(tempthis.$store.state.current_emp_id);
+              } else {
+                // doc.data() will be undefined in this case
+                console.log("No such document!");
 
-    if (doc.data().department==tempthis.id) {
-        console.log("Document data:", doc.data().department);
-         localStorage.setItem('current_emp_id', ID.value)
-        tempthis.$store.state.current_emp_id = ID.value;
-        tempthis.$router.push("createcard");
-        console.log(tempthis.$store.state.current_emp_id);
-    } else {
-        // doc.data() will be undefined in this case
-        console.log("No such document!");
-         
-              tempthis.$swal({
-                type: "error",
-                title: "Sorry",
-                text: "You are not Allowed to Create Card in this Department!"
-              });
-            
-    }
-})
-          
-          }); 
-        
+                tempthis.$swal({
+                  type: "error",
+                  title: "Sorry",
+                  text: "You are not Allowed to Create Card in this Department!"
+                });
+              }
+            });
+          });
       });
     },
-    
 
     showcard: function() {
       console.log(this.$store.state.live_cards);
+    },
+
+    showall: function() {
+      console.log(this.$store.state.department_cards);
+      this.$store.state.cards_project = this.$store.state.department_cards;
+    },
+
+    sortbyproject: function(project, index) {
+      let tempthis = this;
+      tempthis.$store.state.cards_project = [];
+      console.log(project.name);
+      //console.log(this.$store.state.department_cards);
+
+      this.$store.state.department_cards.forEach(function(doc) {
+        if (doc.projectname == project.name) {
+          console.log(doc);
+
+          tempthis.$store.state.cards_project.push(doc);
+
+          console.log(tempthis.$store.state.cards_project);
+        }
+      });
     },
     remove: function(card, index) {
       this.card_id = card.id;
@@ -397,19 +428,20 @@ export default {
         .catch(function(error) {
           console.error("Error removing document: ", error);
         });
-    
     }
   },
 
   created() {
-    this.id=localStorage.getItem('dep_id')
-console.log(this.id)
-    this.$store.state.department_cards= []
-      
-    this.$store.state.live_cards =[]
-    this.$store.state.expired_cards=[]    
-   
-    
+    this.id = localStorage.getItem("dep_id");
+    console.log(this.id);
+    console.log("created");
+    this.$store.state.department_cards = [];
+
+    this.$store.state.live_cards = [];
+    this.$store.state.expired_cards = [];
+    this.$store.state.projects = [];
+    this.$store.state.cards_project = [];
+
     var date = new Date();
     this.current_timestamp = db.app.firebase_.firestore.Timestamp.fromDate(
       date
@@ -417,75 +449,82 @@ console.log(this.id)
 
     console.log(this.$data.current_timestamp);
     console.log("home view created");
+
     let tempthis = this;
 
-    //console.log(this.$store.state.current_dep_id);
-db.collection("Card")
-          .where("department", "==", tempthis.id)
-          .get()
-          .then(function(DocumentSnapshot) {
-            let count=0
-            DocumentSnapshot.forEach(function(doc) {
-              // doc.data() is never undefined for query doc snapshots
-              {
-                var data = doc.data();
-               // console.log(data);
-                console.log(doc.id)
-               // tempthis.flag = 1;
-                // tempthis.$router.push("home");
+    // console.log(this.$store.state.current_dep_id);
 
-                 tempthis.$store.state.department_cards.push(data)
-                tempthis.$store.state.department_cards[count].id = doc.id
+    db.collection("Project")
+      .where("department", "==", this.id.toLowerCase())
+      .get()
+      .then(function(DocumentSnapshot) {
+        DocumentSnapshot.forEach(function(doc) {
+          // doc.data() is never undefined for query doc snapshots
+          var data = doc.data();
+          console.log(data);
+          tempthis.$store.state.projects.push(data);
+        });
 
-                count++
-                
-              }
+        console.log(tempthis.$store.state.projects);
+      });
 
-             
-            })
-             console.log(tempthis.$store.state.department_cards)
-          })
-
-
-,
-
-    db.collection("Card")
+    db
+      .collection("Card")
+      .where("department", "==", tempthis.id)
       .get()
       .then(function(DocumentSnapshot) {
         let count = 0;
         DocumentSnapshot.forEach(function(doc) {
           // doc.data() is never undefined for query doc snapshots
-          var data = doc.data();
+          {
+            var data = doc.data();
+            // console.log(data);
+            console.log(doc.id);
+            // tempthis.flag = 1;
+            // tempthis.$router.push("home");
 
-          tempthis.$store.state.live_cards.push(data)
-          tempthis.$store.state.live_cards[count].id = doc.id;
+            tempthis.$store.state.department_cards.push(data);
+            tempthis.$store.state.department_cards[count].id = doc.id;
 
-          count++;
+            count++;
+          }
         });
-       
-      //Finding Out Expired Cards
-         tempthis.$store.state.live_cards.forEach(element => {
-           
-         let a= element.deadline*24*60*60
+        console.log(tempthis.$store.state.department_cards);
+        tempthis.$store.state.cards_project =
+          tempthis.$store.state.department_cards;
+      }),
+      db
+        .collection("Card")
+        .get()
+        .then(function(DocumentSnapshot) {
+          let count = 0;
+          DocumentSnapshot.forEach(function(doc) {
+            // doc.data() is never undefined for query doc snapshots
+            var data = doc.data();
 
-          let b= element.timestamp.seconds
+            tempthis.$store.state.live_cards.push(data);
+            tempthis.$store.state.live_cards[count].id = doc.id;
 
-          let c= tempthis.current_timestamp
+            count++;
+          });
 
-           if(a +b < c){
+          //Finding Out Expired Cards
+          tempthis.$store.state.live_cards.forEach(element => {
+            let a = element.deadline * 24 * 60 * 60;
 
-            // console.log(element)
+            let b = element.timestamp.seconds;
 
-             tempthis.$store.state.expired_cards.push(element)
+            let c = tempthis.current_timestamp;
 
-           //  console.log("expired" ,  tempthis.$store.state.expired_cards)
+            if (a + b < c) {
+              // console.log(element)
 
-           }
-         });
-      });
+              tempthis.$store.state.expired_cards.push(element);
 
-
-    
+              //  console.log("expired" ,  tempthis.$store.state.expired_cards)
+            }
+          });
+        });
   }
 };
 </script>
@@ -495,9 +534,8 @@ db.collection("Card")
 @import url("https://fonts.googleapis.com/css?family=Raleway|Roboto");
 @import url("https://unpkg.com/element-ui/lib/theme-chalk/index.css");
 
-
-.deadline{
-      align-self: center;
+.deadline {
+  align-self: center;
 }
 #products {
   width: 100%;
@@ -506,9 +544,8 @@ db.collection("Card")
   width: 34%;
   height: 466px;
 }
-.border{
-
-  border: red 2px solid
+.border {
+  border: red 2px solid;
 }
 .title {
   text-align: left;
@@ -518,13 +555,12 @@ db.collection("Card")
   display: flex;
   margin-top: 1%;
   margin-left: 5%;
-  height:25px
+  height: 25px;
 }
-.line{
-
-  width:100%;
-  height:7px;
- border-top: 1px solid rgba(0,0,0,.05);
+.line {
+  width: 100%;
+  height: 7px;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
 }
 #desc {
   height: 90px;
@@ -541,10 +577,9 @@ db.collection("Card")
 #card {
   width: 85%;
   margin-left: 7%;
- box-shadow: 3px 3px 5px 6px rgb(218, 214, 214);
+  box-shadow: 3px 3px 5px 6px rgb(218, 214, 214);
   height: 440px;
   padding: 0px;
-  
 }
 
 #navbar {
@@ -575,6 +610,10 @@ a {
   margin-top: 1%;
 }
 
+a {
+  color: white;
+}
+
 #searchicon {
   position: absolute;
   background: linear-gradient(80deg, #ffd86f, #fc6262);
@@ -597,6 +636,26 @@ a {
 }
 
 @media screen and (max-width: 480px) {
+  #searchicon {
+    height: 38%;
+    font-size: 16px;
+    width: 7%;
+    margin-top: 2.5%;
+  }
+  #inputsearch {
+    width: 86%;
+    margin-top: 6%;
+  }
+  #text {
+    width: 34%;
+    margin-top: 5%;
+    margin-left: 5%;
+    font-size: 120%;
+  }
+  #navbar {
+    font-size: 30%;
+    margin-top: 0%;
+  }
   #store-col {
     width: 100%;
     height: 466px;
@@ -606,6 +665,19 @@ a {
     width: 100%;
 
     margin-left: -1%;
+  }
+  #createicon {
+    margin-top: 10%;
+    margin-left: 16%;
+    border-radius: 50%;
+    box-shadow: 0 0 5px black;
+    width: 45%;
+    height: 32px;
+    font-size: 19px;
+    box-shadow: 1px 1px 9px 0px black;
+  }
+  #card {
+    margin-left: 8%;
   }
 }
 
@@ -628,11 +700,10 @@ a {
 @media screen and (min-width: 1025px) and (max-width: 1400px) {
   #store-col {
     width: 25%;
-    margin-top:5%
+    margin-top: 5%;
   }
-  .deadline{
-
-    margin-left:34%
+  .deadline {
+    margin-left: 34%;
   }
 }
 </style>

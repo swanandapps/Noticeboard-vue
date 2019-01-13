@@ -14,10 +14,16 @@ import 'vuetify/dist/vuetify.min.css'
 import ElementUI from 'element-ui'
 import locale from 'element-ui/lib/locale/lang/en'
 import 'element-ui/lib/theme-chalk/index.css'
-import createPersistedState from 'vuex-persistedstate'
-import * as Cookies from 'js-cookie'
+import VeeValidate from 'vee-validate';
 
-Vue.use(ElementUI, { locale })
+
+
+
+Vue.use(VeeValidate);
+
+Vue.use(ElementUI, {
+    locale
+})
 
 Vue.use(Vuetify)
 
